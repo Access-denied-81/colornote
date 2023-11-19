@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login_Page</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+    <script src="https://kit.fontawesome.com/bb97e0b8a2.js" crossorigin="anonymous"></script>
+    <style>
+        /* Adding CSS for the background image and other styles */
+        body {
+            background-image: url('static/img/marsdoodle.png'); /* Replace 'path_to_your_image.jpg' with the actual path to your image */
+            background-size: cover;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif; /* Adding a font-family for better readability */
+            /* Add any additional styles for the body here */
+        }
+        /* Adding CSS to hide and show elements based on button click */
+        
+        #signupSubmit {
+            display: block;
+        }
+
+        #signinSubmit {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-box">
+            <h1 id="title">Sign Up</h1>
+            <form method="post">
+                {% csrf_token %}
+                <div class="input-group">
+                    <div class="input-field" id="nameField">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" name="username" placeholder="NAME">
+                    </div>
+                    <div class="input-field">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="email" name="email" placeholder="Email">
+                    </div>
+                    <div class="input-field">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="password" name="password" placeholder="Password">
+                    </div>
+                    <p>Forgot password <a href="#">Click Here!</a></p>
+                </div>
+                <div class="btn-field">
+                    <button type="button" id="signupBtn">sign-up</button>
+                    <button type="button" id="signinBtn" class="disable">sign-in</button>
+                    <button type="submit" id="signupSubmit">Submit (Sign Up)</button>
+                    <button type="submit" id="signinSubmit">Submit (Sign In)</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        let signupBtn = document.getElementById("signupBtn");
+        let signinBtn = document.getElementById("signinBtn");
+        let nameField = document.getElementById("nameField");
+        let title = document.getElementById("title");
+        let signupSubmit = document.getElementById("signupSubmit");
+        let signinSubmit = document.getElementById("signinSubmit");
+
+        signinBtn.onclick = function(){
+            nameField.style.maxHeight = "0";
+            title.innerHTML = "Sign In";
+            signupBtn.classList.add("disable");
+            signinBtn.classList.remove("disable");
+            signupSubmit.style.display = "none";
+            signinSubmit.style.display = "block";
+        }
+        
+        signupBtn.onclick = function(){
+            nameField.style.maxHeight = "60px";
+            title.innerHTML = "Sign up";
+            signupBtn.classList.remove("disable");
+            signinBtn.classList.add("disable");
+            signupSubmit.style.display = "block";
+            signinSubmit.style.display = "none";
+        }
+    </script>
+</body>
+</html>
