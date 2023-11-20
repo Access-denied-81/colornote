@@ -4,25 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mars Doodle</title>
-  <link rel="stylesheet" href="static/css/home.css">
+  <link rel="stylesheet" href="home.css">
   <script src="https://kit.fontawesome.com/bb97e0b8a2.js" crossorigin="anonymous"></script>
   <style>
-    /* CSS for container box */
-    .container{
-      width: 100%;
-      height: 100vh;
-      background-image:  url('static/img/marsdoodle2.jpeg');
-      background-position: center;
-      background-size: contain;
-      position: relative;
-      aspect-ratio : 100/29;
-    }
-
-    /* CSS for the canvas */
     canvas {
       border: 1px solid #000;
       background-color: aliceblue;
-
     }
 
     #toolbox {
@@ -33,34 +20,34 @@
 <body>
   <div class="container">
     <div class="form-box">
-      <h1 id="title">Mars Doodle</h1>
-    <form>
-      <div id="toolbox">
-        <label for="tool">Tool:</label>
-        <select id="tool" onchange="selectTool()">
-          <option value="pen">Pen</option>
-          <option value="eraser">Eraser</option>
-        </select>
+  <h1 id="title">Mars Doodle</h1>
+<form>
+  <div id="toolbox">
+    <label for="tool">Tool:</label>
+    <select id="tool" onchange="selectTool()">
+      <option value="pen">Pen</option>
+      <option value="eraser">Eraser</option>
+    </select>
 
-        <label for="color">Color:</label>
-        <input type="color" id="color" onchange="selectColor()" value="#000000">
+    <label for="color">Color:</label>
+    <input type="color" id="color" onchange="selectColor()" value="#000000">
 
-        <label for="size">Size:</label>
-        <input type="range" id="size" min="1" max="20" onchange="selectSize()" value="5">
-      </div>
+    <label for="size">Size:</label>
+    <input type="range" id="size" min="1" max="20" onchange="selectSize()" value="5">
+  </div>
 
-      <div id="drawingArea">
-        <canvas id="canvas" width="600" height="300" style="border:1px solid #000000"></canvas>
-        <br>
-        <button onclick="clearCanvas()">Clear Canvas</button>
-      </div>
+  <div id="drawingArea">
+    <canvas id="canvas" width="600" height="300"></canvas>
+    <br>
+    <button onclick="clearCanvas()">Clear Canvas</button>
+  </div>
 
-      <div id="guessingArea">
-        <label for="guess">Guess the Drawing:</label>
-        <input type="text" id="guess" placeholder="Enter your guess">
-        <button onclick="submitGuess()">Submit Guess</button>
-      </div>
-    </form>
+  <div id="guessingArea">
+    <label for="guess">Guess the Drawing:</label>
+    <input type="text" id="guess" placeholder="Enter your guess">
+    <button onclick="submitGuess()">Submit Guess</button>
+  </div>
+</form>
 </div>
 </div>
 

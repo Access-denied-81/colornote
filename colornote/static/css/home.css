@@ -1,0 +1,53 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+
+}
+
+.form-box{
+        width: 90%;
+        height: 75%;
+        max-width: 750px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        background: rgb(224, 188, 188);
+        padding: 50px 60px 70px;
+        text-align: center;  
+
+
+
+}
+.form-box h1{
+    font-size: 60px;
+    margin-top: 1px;
+    margin-bottom: 10px;
+    color: rgb(140, 63, 12);
+    position: relative;
+}
+ 
+.form-box h1::after{
+        content: '';
+        width: 30px;
+        height: 4px;
+        border-radius: 2px;
+        background: rgb(3, 13, 96,27, 160);
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+
+
+}
+/* Add this to your existing <style> tag or home.css file */
+h1 {
+    color: #1f0554; /* Change the color to your preference */
+    font-family: 'CustomCursiveFont', cursive; /* Change the font family to your preference */
+    text-align: center; /* Center-align the text */
+    /* Add more styles as needed */
+  }
+  /* Add this to your existing <style> tag or home.css file */
+/* Add this to your existing <style> tag or home.css file */
