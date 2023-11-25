@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mars Doodle</title>
+  <link rel="stylesheet" href="static/css/board.css">
+  <script src="https://kit.fontawesome.com/bb97e0b8a2.js" crossorigin="anonymous"></script>
+  <style>
+    
+    .form-box {
+      width: 90%;
+      height: auto; /* Change the height to auto to accommodate content */
+      max-width: 800px;
+      margin: 0 auto; /* Center horizontally */
+      position: relative;
+      top: 50%;
+      transform: translateY(-100%);
+      background: rgb(224, 188, 188);
+      background-image: url('static/img/Design.jpeg');
+      padding: 50px 60px 70px;
+      text-align: center;  
+    }
+    
+
+    canvas {
+      border: 1px solid #000;
+      background-color: aliceblue;
+      border-radius: 15px;
+      margin-top: 20px;
+      width: 100%%
+    }
+    #toolbox {
+      margin-top: 10px;
+    }
+    #chatbox {
+      width: 240px;
+      height: 420px;
+      border: 1px solid ;
+      padding: 10px;
+      overflow-y: scroll;
+    }
+  </style>
+</head>
+<body  style="font-family: 'Arial', sans-serif; background-color: #f0f0f0; color: #333;">
+  
+
+  <div id="chatbox">
+    <h1>Chat </h1>
+  </div>
+  <div>
+    <textarea id="messageInput" placeholder="Type your message..." size="50"></textarea>
+  </div>
+  <div>
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    const chatbox = document.getElementById('chatbox');
+    // Dummy data for testing
+    const messages = [
+      // Add more messages as needed
+    ];
+
+    // Display existing messages
+    messages.forEach(message => displayMessage(message.user, message.text));
+
+    function displayMessage(user, text) {
+      const messageContainer = document.createElement('div');
+      messageContainer.textContent = `${user}: ${text}`;
+      chatbox.appendChild(messageContainer);
+
+      // Scroll to the bottom to show the latest messages
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function sendMessage() {
+      const messageInput = document.getElementById('messageInput');
+      const message = messageInput.value;
+
+      // Display the sent message in the chatbox
+      displayMessage('You', message);
+
+      // Clear the input field
+      messageInput.value = '';
+    }
+  </script>
+  <div class="container">
+    <div class="form-box">
+  <h1 id="title">Mars Doodle</h1>
+<form>
+  <div id="toolbox">
+    <label for="tool">Tool:</label>
+    <select id="tool" onchange="selectTool()">
+      <option value="pen">Pen</option>
+      <option value="eraser">Eraser</option>
+    </select>
+
+    <label for="color">Color:</label>
+    <input type="color" id="color" onchange="selectColor()" value="#000000">
+
+    <label for="size">Size:</label>
+    <input type="range" id="size" min="1" max="20" onchange="selectSize()" value="5">
+  </div>
+
+  <div id="drawingArea">
+    <canvas id="canvas" width="600" height="300"></canvas>
+    <br>
+    <button onclick="clearCanvas()">Clear Canvas</button>
+  </div>
+</form>
+</div>
+</div>
+
+  <script>
+    const drawingCanvas = document.getElementById('canvas');
+    const context = drawingCanvas.getContext('2d');
+
+    const wsScheme = window.location.protocol === "https:" ? "wss://" : "ws://";
+    const wsPath = wsScheme + window.location.host + '/ws/drawing/';  // Your WebSocket path
+
+    const ws = new WebSocket(wsPath);
+
+    ws.onopen = function () {
+      console.log('WebSocket connection established.');
+    };
+
+    ws.onerror = function (error) {
+      console.error('WebSocket error:', error);
+    };
+        
+    ws.onmessage = function (event) {
+      const data = JSON.parse(event.data);
+      // Handle received drawing data
+      // Example: draw on the canvas
+      drawOnCanvas(data);
+    };
+
+    drawingCanvas.addEventListener('mousemove', function (event) {
+      // Handle drawing events (e.g., mouse movement)
+      // Example: capture mouse coordinates and send drawing data to the server
+      const rect = drawingCanvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      // Send drawing data to the server via WebSocket
+      const drawingData = {
+        x: x,
+        y: y,
+        // Include any additional data if needed
+      };
+      ws.send(JSON.stringify(drawingData));
+    });
+
+    function drawOnCanvas(data) {
+      // Implement logic to draw on the canvas using received data
+      // Example: draw a point based on x and y coordinates
+      context.beginPath();
+      context.arc(data.x, data.y, 5, 0, 2 * Math.PI);
+      context.fillStyle = 'black';
+      context.fill();
+      context.closePath();
+    }
+
+/*
+    let isDrawing = false;
+    let currentTool = 'pen';
+    let currentColor = '#000000';
+    let currentSize = 5;
+    let title = document.getElementById("title");
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+    
+    ws.onmessage = function (event) {
+      // getting data from JSON file
+      const data = JSON.parse(event.data);
+      // Handle received drawing data
+      // Example: draw on the canvas
+      draw(e);
+  };
+
+    function startDrawing(e) {
+      isDrawing = true;
+      draw(e);
+    }
+
+    function draw(e,data) {
+      if (!isDrawing) return;
+      ctx.beginPath();
+      ctx.lineWidth = currentSize;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = currentColor;
+      if !data:
+        const x = e.clientX - canvas.getBoundingClientRect().left;
+        const y = e.clientY - canvas.getBoundingClientRect().top;
+      else:
+        const x = data.x
+        const y = data.y 
+      
+      const drawingData = {
+        x: x,
+        y: y,
+        // Include any additional data if needed
+      };
+      
+      ws.send(JSON.stringify(drawingData));
+
+
+      if (currentTool === 'pen') {
+        ctx.globalCompositeOperation = 'source-over'; // Set the default drawing mode
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      } 
+      else if (currentTool === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out'; // Use destination-out to simulate erasing
+        ctx.arc(x, y, currentSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function stopDrawing() {
+      isDrawing = false;
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function selectTool() {
+      currentTool = document.getElementById('tool').value;
+    }
+
+    function selectColor() {
+      currentColor = document.getElementById('color').value;
+    }
+
+    function selectSize() {
+      currentSize = document.getElementById('size').value;
+    }
+*/
+  </script>
+</body>
+</html>

@@ -36,4 +36,4 @@ def login_user(request):
     return render(request,"authenticate/login.html")
 
 def board(request):
-    return render(request,"game/board.html")
+    return render(request,"game/board4.html")
