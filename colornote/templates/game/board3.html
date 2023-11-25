@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mars Doodle</title>
+  <link rel="stylesheet" href="static/css/home.css">
+  <script src="https://kit.fontawesome.com/bb97e0b8a2.js" crossorigin="anonymous"></script>
+  <style>
+    /* CSS for container box */
+    .container{
+      width: 100%;
+      height: 100vh;
+      background-image:  url('static/img/marsdoodle2.jpeg');
+      background-position: center;
+      background-size: contain;
+      position: relative;
+      aspect-ratio : 100/29;
+      justify-content : center;
+      align-items : center;
+    }
+
+    /* CSS for the canvas */
+    canvas {
+      border: 1px solid #000;
+      background-color: aliceblue;
+
+    }
+
+    #toolbox {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-box">
+      <h1 id="title">Mars Doodle</h1>
+    <form>
+      <div id="toolbox">
+        <label for="tool">Tool:</label>
+        <select id="tool" onchange="selectTool()">
+          <option value="pen">Pen</option>
+          <option value="eraser">Eraser</option>
+        </select>
+
+        <label for="color">Color:</label>
+        <input type="color" id="color" onchange="selectColor()" value="#000000">
+
+        <label for="size">Size:</label>
+        <input type="range" id="size" min="1" max="20" onchange="selectSize()" value="5">
+      </div>
+
+      <div id="drawingArea">
+        <canvas id="canvas" width="600" height="300" style="border:1px solid #000000"></canvas>
+        <br>
+        <button onclick="clearCanvas()">Clear Canvas</button>
+      </div>
+
+      <div id="guessingArea">
+        <label for="guess">Guess the Drawing:</label>
+        <input type="text" id="guess" placeholder="Enter your guess">
+        <button onclick="submitGuess()">Submit Guess</button>
+      </div>
+    </form>
+</div>
+</div>
+
+  <script>
+    <!-- Your HTML and CSS code remain unchanged -->
+    
+    <!-- Script code for implementing websockets-->
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let currentTool = 'pen';
+    let currentColor = '#000000';
+    let currentSize = 5;
+    let title = document.getElementById("title");
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    // WebSocket connection to the server
+    const wsScheme = window.location.protocol === "https:" ? "wss://" : "ws://";
+    const wsPath = wsScheme + window.location.host + '/ws/drawing/';  // Replace this with your WebSocket path
+    const ws = new WebSocket(wsPath);
+
+    ws.onopen = function () {
+        console.log('WebSocket connection established.');
+    };
+
+    ws.onerror = function (error) {
+        console.error('WebSocket error:', error);
+    };
+
+    ws.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        drawOnCanvas(data);
+    };
+
+    function startDrawing(e) {
+        isDrawing = true;
+        draw(e);
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        ctx.beginPath();
+        ctx.lineWidth = currentSize;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = currentColor;
+        const x = e.clientX - canvas.getBoundingClientRect().left;
+        const y = e.clientY - canvas.getBoundingClientRect().top;
+
+        if (currentTool === 'pen') {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        } else if (currentTool === 'eraser') {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.arc(x, y, currentSize / 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Send drawing data to the server via WebSocket
+        const drawingData = {
+            x: x,
+            y: y,
+            tool: currentTool,
+            color: currentColor,
+            size: currentSize
+        };
+        ws.send(JSON.stringify(drawingData));
+    }
+
+    function stopDrawing() {
+        isDrawing = false;
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Send a signal to the server to clear the canvas for other users
+        const clearData = { clearCanvas: true };
+        ws.send(JSON.stringify(clearData));
+    }
+
+    function selectTool() {
+        currentTool = document.getElementById('tool').value;
+    }
+
+    function selectColor() {
+        currentColor = document.getElementById('color').value;
+    }
+
+    function selectSize() {
+        currentSize = document.getElementById('size').value;
+    }
+
+    function drawOnCanvas(data) {
+        // Implement logic to draw on the canvas using received data
+        // Example: draw a line or point based on data
+        ctx.beginPath();
+        ctx.lineWidth = data.size;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = data.color;
+
+        if (data.tool === 'pen') {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.moveTo(data.x, data.y);
+        ctx.lineTo(data.x, data.y);
+        ctx.stroke();
+        } else if (data.tool === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.arc(data.x, data.y, data.size / 2, 0, Math.PI * 2);
+        ctx.fill();
+        }
+    }
+
+
+    <!-- script code to implement design features-->
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let currentTool = 'pen';
+    let currentColor = '#000000';
+    let currentSize = 5;
+    let title = document.getElementById("title");
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    function startDrawing(e) {
+      isDrawing = true;
+      draw(e);
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      ctx.beginPath();
+      ctx.lineWidth = currentSize;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = currentColor;
+      const x = e.clientX - canvas.getBoundingClientRect().left;
+      const y = e.clientY - canvas.getBoundingClientRect().top;
+
+      if (currentTool === 'pen') {
+        ctx.globalCompositeOperation = 'source-over'; // Set the default drawing mode
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      } else if (currentTool === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out'; // Use destination-out to simulate erasing
+        ctx.arc(x, y, currentSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function stopDrawing() {
+      isDrawing = false;
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function selectTool() {
+      currentTool = document.getElementById('tool').value;
+    }
+
+    function selectColor() {
+      currentColor = document.getElementById('color').value;
+    }
+
+    function selectSize() {
+      currentSize = document.getElementById('size').value;
+    }
+
+    function submitGuess() {
+      const guessInput = document.getElementById('guess');
+      const guess = guessInput.value;
+
+      // Implement logic to check the guess against the actual drawing
+      // For simplicity, let's just alert the guess for now
+      alert(`Your guess: ${guess}`);
+    }
+  </script>
+</body>
+</html>

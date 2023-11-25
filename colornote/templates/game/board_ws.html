@@ -1,0 +1,65 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drawing App</title>
+    <!-- Include any CSS or stylesheets here -->
+</head>
+<body>
+    <canvas id="drawingCanvas" width="800" height="600"></canvas>
+
+    <script>
+        const drawingCanvas = document.getElementById('drawingCanvas');
+        const context = drawingCanvas.getContext('2d');
+
+        const wsScheme = window.location.protocol === "https:" ? "wss://" : "ws://";
+        const wsPath = wsScheme + window.location.host + '/ws/drawing/';  // Your WebSocket path
+
+        const ws = new WebSocket(wsPath);
+
+        ws.onopen = function () {
+            console.log('WebSocket connection established.');
+        };
+
+        ws.onerror = function (error) {
+            console.error('WebSocket error:', error);
+        };
+
+        ws.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            // Handle received drawing data
+            // Example: draw on the canvas
+            drawOnCanvas(data);
+        };
+
+        drawingCanvas.addEventListener('mousemove', function (event) {
+            // Handle drawing events (e.g., mouse movement)
+            // Example: capture mouse coordinates and send drawing data to the server
+            const rect = drawingCanvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            // Send drawing data to the server via WebSocket
+            const drawingData = {
+                x: x,
+                y: y,
+                // Include any additional data if needed
+            };
+            ws.send(JSON.stringify(drawingData));
+        });
+
+        function drawOnCanvas(data) {
+            // Implement logic to draw on the canvas using received data
+            // Example: draw a point based on x and y coordinates
+            context.beginPath();
+            context.arc(data.x, data.y, 5, 0, 2 * Math.PI);
+            context.fillStyle = 'black';
+            context.fill();
+            context.closePath();
+        }
+        
+    </script>
+</body>
+</html>

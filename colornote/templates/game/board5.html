@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mars Doodle</title>
+  <link rel="stylesheet" href="board.css">
+  <script src="https://kit.fontawesome.com/bb97e0b8a2.js" crossorigin="anonymous"></script>
+  <style>
+    
+    .form-box {
+      width: 90%;
+      height: auto; /* Change the height to auto to accommodate content */
+      max-width: 800px;
+      margin: 0 auto; /* Center horizontally */
+      position: relative;
+      top: 50%;
+      transform: translateY(-80%);
+      background: rgb(224, 188, 188);
+      background-image: url('static/img/Design.jpeg');
+      padding: 50px 60px 70px;
+      text-align: center;  
+    }
+    
+
+    canvas {
+      border: 1px solid #000;
+      background-color: aliceblue;
+      border-radius: 15px;
+      margin-top: 20px;
+      width: 100%%
+    }
+    #toolbox {
+      margin-top: 10px;
+    }
+    #chatbox {
+      width: 150px;
+      height: 400px;
+      border: 1px solid ;
+      padding: 10px;
+      overflow-y: scroll;
+    }
+  </style>
+</head>
+<body  style="font-family: 'Arial', sans-serif; background-color: #f0f0f0; color: #333;">
+  
+
+  <div id="chatbox">
+    <h1>Chat </h1>
+  </div>
+  <div>
+    <textarea id="messageInput" placeholder="Type your message..." size="50"></textarea>
+  </div>
+  <div>
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    // Modify your client-side JavaScript code to establish a WebSocket connection
+
+    const wsScheme = window.location.protocol === "https:" ? "wss://" : "ws://";
+    const wsPath = wsScheme + window.location.host + '/ws/drawing/';  // WebSocket path
+    const ws = new WebSocket(wsPath);
+
+    ws.onopen = () => {
+        console.log('Connected to the server');
+    };
+
+    ws.onmessage = (event) => {
+        displayMessage(event.data); // Call the displayMessage function with received data
+    };
+
+    function sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value;
+
+        // Send the message through WebSocket
+        ws.send(message);
+
+        // Display the sent message in the chatbox
+        displayMessage('You', message);
+
+        // Clear the input field
+        messageInput.value = '';
+    }
+
+    // Display function - remains similar to the previous logic
+    function displayMessage(user, text) {
+        const chatbox = document.getElementById('chatbox');
+        const messageContainer = document.createElement('div');
+        messageContainer.textContent = `${user}: ${text}`;
+        chatbox.appendChild(messageContainer);
+
+        // Scroll to the bottom to show the latest messages
+        chatbox.scrollTop = chatbox.scrollHeight;
+    }
+  </script>
+  <div class="container">
+    <div class="form-box">
+  <h1 id="title">Mars Doodle</h1>
+<form>
+  <div id="toolbox">
+    <label for="tool">Tool:</label>
+    <select id="tool" onchange="selectTool()">
+      <option value="pen">Pen</option>
+      <option value="eraser">Eraser</option>
+    </select>
+
+    <label for="color">Color:</label>
+    <input type="color" id="color" onchange="selectColor()" value="#000000">
+
+    <label for="size">Size:</label>
+    <input type="range" id="size" min="1" max="20" onchange="selectSize()" value="5">
+  </div>
+
+  <div id="drawingArea">
+    <canvas id="canvas" width="600" height="300"></canvas>
+    <br>
+    <button onclick="clearCanvas()">Clear Canvas</button>
+  </div>
+
+  <!--
+  <div id="guessingArea">
+    <label for="guess">Guess the Drawing:</label>
+    <input type="text" id="guess" placeholder="Enter your guess">
+    <button onclick="submitGuess()">Submit Guess</button>
+  </div>
+  -->
+</form>
+</div>
+</div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let currentTool = 'pen';
+    let currentColor = '#000000';
+    let currentSize = 5;
+    let title = document.getElementById("title");
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    function startDrawing(e) {
+      isDrawing = true;
+      draw(e);
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      ctx.beginPath();
+      ctx.lineWidth = currentSize;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = currentColor;
+      const x = e.clientX - canvas.getBoundingClientRect().left;
+      const y = e.clientY - canvas.getBoundingClientRect().top;
+
+      if (currentTool === 'pen') {
+        ctx.globalCompositeOperation = 'source-over'; // Set the default drawing mode
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      } else if (currentTool === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out'; // Use destination-out to simulate erasing
+        ctx.arc(x, y, currentSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function stopDrawing() {
+      isDrawing = false;
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function selectTool() {
+      currentTool = document.getElementById('tool').value;
+    }
+
+    function selectColor() {
+      currentColor = document.getElementById('color').value;
+    }
+
+    function selectSize() {
+      currentSize = document.getElementById('size').value;
+    }
+
+    function submitGuess() {
+      const guessInput = document.getElementById('guess');
+      const guess = guessInput.value;
+
+      // For simplicity, let's just alert the guess for now
+      alert(`Your guess: ${guess}`);
+    }
+  </script>
+</body>
+</html>
